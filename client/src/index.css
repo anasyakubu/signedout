@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-paper text-ink font-body antialiased;
+}
+
+/* The signature line: SignedOut's one recurring visual motif — a flat rule
+   that headings "sign" above, echoing the line you sign your name on. */
+.signature-line {
+  @apply block h-[3px] w-16 bg-laurel;
+}
+
+:focus-visible {
+  outline: 2px solid #1c5a3f;
+  outline-offset: 2px;
+}
