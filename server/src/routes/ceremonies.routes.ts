@@ -14,6 +14,7 @@ const ceremonySchema = z.object({
   description: z.string().trim().max(1000).optional(),
   date: z.coerce.date(),
   shirtColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Shirt color must be a hex color.').optional(),
+  garment: z.enum(['classic-tee','oversized-tee','boxy-tee','long-sleeve','crewneck','hoodie','polo']).optional(),
   visibility: z.enum(['public', 'invite', 'group']).optional(),
   groupId: z.string().optional(),
 });

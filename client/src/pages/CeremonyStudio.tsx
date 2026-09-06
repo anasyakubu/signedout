@@ -4,6 +4,7 @@ import { api, ApiError } from '../lib/api';
 import { CeremonyData, SignatureData, PaymentRequiredInfo } from '../lib/types';
 import { Wordmark, Button, FormError } from '../components/ui';
 import ShirtViewer from '../three/ShirtScene';
+import { GarmentId } from '../three/garments';
 import CheckoutPanel from '../features/payments/CheckoutPanel';
 import { exportPng, exportPdf } from '../lib/exportShirt';
 
@@ -124,6 +125,15 @@ export default function CeremonyStudio() {
     await load();
   }
 
+  async function changeGarment(garment: GarmentId) {
+    if (!id) return;
+    await api(`/api/ceremonies/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ garment }),
+    });
+    await load();
+  }
+
   async function runExport(kind: 'png-front' | 'png-back' | 'pdf') {
     if (!id) return;
     setExporting(kind);
@@ -178,6 +188,8 @@ export default function CeremonyStudio() {
           shirtColor={ceremony.shirtColor}
           assets={ceremony.baseAssets}
           signatures={signatures}
+          garment={ceremony.garment as GarmentId | undefined}
+          onGarmentChange={canEdit ? changeGarment : undefined}
         />
 
         <div className="space-y-8">

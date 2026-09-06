@@ -47,9 +47,10 @@
   to the panel), `scale` and `fontSize` are fractions of panel width, `rotation` is
   degrees. The panel ratio is fixed at 5:6 (width:height). The same data draws
   identically on the 1024px live texture and the 3000x3600 print render.
-- **Procedural shirt mesh** (silhouette Shape, extruded body + front/back textured
+- ~~**Procedural shirt mesh** (silhouette Shape, extruded body + front/back textured
   panels) instead of a downloaded .glb: no licensing questions, no binary in the
-  repo, and the signing surface stays a flat canvas exactly as prescribed.
+  repo, and the signing surface stays a flat canvas exactly as prescribed.~~
+  **Reversed — see "Garment system" below.**
 - **`invite` visibility = unlisted link** (anyone with the URL). `group` visibility
   requires a signed-in group member. True per-person invites need outbound email,
   which is out of scope until an email provider is chosen.
@@ -73,3 +74,51 @@
 - **Signature text capped at 60 chars**, fonts restricted to a curated list of six
   (server-enforced), drawn/uploaded signature images normalized to <=1200px PNG via
   sharp; base assets to <=1600px PNG.
+
+## Garment system (supersedes the procedural mesh decision)
+
+- **The extruded silhouette was reversed.** `ExtrudeGeometry` on a 2D outline
+  produces a flat cutout with a bevelled edge — recognisably a shirt, but not
+  close to what a customer compares us against (VirtualThreads and similar use
+  real garment meshes with simulated wrinkles). The licensing and repo-size
+  arguments were sound; the visual result was not acceptable. Models now load
+  from `client/public/models/*.glb`, which are gitignored assets rather than
+  committed binaries, so the "no binary in the repo" concern still holds.
+
+- **`drawPanel()` was deliberately left untouched.** A real garment's UVs are
+  spread across the whole mesh, not a flat 5:6 rectangle, so the obvious move —
+  teaching the panel renderer about 3D — would have broken the WYSIWYG export
+  guarantee that the whole print pipeline rests on. Instead `composeAtlas()`
+  composites the two flat panel canvases into a declared rectangle of each
+  garment's UV atlas (`GarmentDef.panels`). The export path still renders the
+  exact same canvas at 3000x3600 and is still pixel-identical to the preview.
+
+- **Panel rects are per-model data, not code.** Every garment's UV layout
+  differs, so `garments.ts` carries `{x, y, w, h, flipX}` per side and the
+  viewer ships a calibration overlay (`?uvdebug=1`) that draws a labelled grid
+  into those rects. Dialling in a new model is editing four numbers, not
+  writing a mapping function.
+
+- **A missing .glb degrades to the old procedural mesh** rather than a blank
+  canvas, and says so under the viewer. This keeps the app runnable before any
+  models are purchased, and keeps a bad CDN response from breaking the studio.
+
+- **The fabric normal map is generated in code** (`fabricNormalMap()`: a weave
+  height field plus fibre noise, differentiated into tangent-space normals)
+  rather than shipped as a texture. Flat cloth reads as plastic regardless of
+  mesh quality, and this avoids another licensed binary. Models that ship their
+  own normal/roughness maps keep them; the generated one is only the fallback.
+
+- **Lighting is an in-scene `<Lightformer>` softbox rig**, not a drei
+  `<Environment preset>`. The presets fetch an HDRI from a CDN at runtime,
+  which is a third-party dependency on the critical render path for a
+  self-hosted app. The rig costs a few lines and works offline.
+
+- **`Ceremony.garment` is an enum mirrored from `GARMENTS`** in
+  `client/src/three/garments.ts`. Adding a garment means adding its id in both
+  places — deliberate duplication, so an unknown id is rejected at the API
+  boundary instead of silently rendering the default.
+
+- **The garment picker is owner-only.** `ShirtViewer` renders it only when
+  `onGarmentChange` is passed, so the public sign page shows the owner's choice
+  read-only. Signers pick a signature, not a garment.

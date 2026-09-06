@@ -23,7 +23,7 @@ export async function canEdit(ceremony: ICeremony, userId: string): Promise<bool
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.auth!.sub;
-    const { title, description, date, shirtColor, visibility, groupId } = req.body;
+    const { title, description, date, shirtColor, garment, visibility, groupId } = req.body;
 
     if (groupId) {
       const group = await Group.findById(groupId);
@@ -61,6 +61,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       description,
       date,
       shirtColor,
+      garment,
       visibility: visibility ?? (groupId ? 'group' : 'public'),
       groupId: groupId || undefined,
       ownerId: userId,
@@ -110,7 +111,15 @@ export async function update(req: Request, res: Response, next: NextFunction) {
     if (!(await canEdit(ceremony, req.auth!.sub))) {
       throw new HttpError(403, 'You do not have edit access to this ceremony.');
     }
-    const allowed = ['title', 'description', 'date', 'shirtColor', 'visibility', 'baseAssets'];
+    const allowed = [
+      'title',
+      'description',
+      'date',
+      'shirtColor',
+      'garment',
+      'visibility',
+      'baseAssets',
+    ];
     for (const key of allowed) {
       if (key in req.body) (ceremony as unknown as Record<string, unknown>)[key] = req.body[key];
     }
@@ -159,6 +168,7 @@ export async function getPublicBySlug(req: Request, res: Response, next: NextFun
         description: ceremony.description,
         date: ceremony.date,
         shirtColor: ceremony.shirtColor,
+        garment: ceremony.garment,
         baseAssets: ceremony.baseAssets,
         isLocked: ceremony.isLocked,
         slug: ceremony.slug,

@@ -45,7 +45,9 @@ server/src
   services/      storage (local|S3), payments (Paystack|Flutterwave|registry), pricing, fulfillment, googleOAuth
   middleware/    auth (require/optional/admin), validate (Zod), upload (multer), rateLimiter, sanitize, errorHandler
 client/src
-  three/         drawPanel.ts (the one canvas renderer), ShirtScene.tsx (3D viewer)
+  three/         drawPanel.ts (the one canvas renderer), garments.ts (garment catalogue +
+                 UV panel rects), garmentTexture.ts (atlas compositor + fabric normal map),
+                 ShirtScene.tsx (3D viewer)
   features/      signing (PlacementPanel, DrawPad), payments (checkout, CheckoutPanel)
   pages/         Landing, Login, Register, Profile, Dashboard, CeremonyNew, CeremonyStudio,
                  SignPage (public), Groups, GroupDetail, JoinGroup, PayCallback, Admin
@@ -70,9 +72,16 @@ This code was written and compiler-parsed in an offline environment: it has **no
 - [ ] Remove the asset; change the shirt color from the studio
 - [ ] The share link opens the public sign page in a private/incognito window
 
-### Phase 3 — 3D shirt
+### Phase 3 — 3D garment
 - [ ] Shirt rotates by drag, zooms by scroll; Front/Back buttons ease the shirt around
 - [ ] Base assets show on the correct side at the placed position/scale/rotation
+- [ ] With no `.glb` in `client/public/models/`, the viewer falls back to the placeholder
+      shape and says so — the studio still works end to end
+- [ ] After adding a model, `?uvdebug=1` draws the FRONT/BACK calibration grid; the rects
+      in `garments.ts` are tuned until it sits square on the chest
+- [ ] Switching garment in the studio persists (reload keeps it) and the public sign page
+      shows the same garment with no picker
+- [ ] Export still matches the preview exactly after a garment change
 
 ### Phase 4 — Signing
 - [ ] As a signed-out guest: name required; typed signature with each of the six fonts lands where placed

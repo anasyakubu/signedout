@@ -17,6 +17,7 @@ export interface CeremonyData {
   slug: string;
   visibility: 'public' | 'invite' | 'group';
   shirtColor: string;
+  garment?: string;
   baseAssets: BaseAsset[];
   isLocked: boolean;
   isPaidTier?: boolean;

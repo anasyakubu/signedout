@@ -3,3 +3,6 @@ node_modules/
 server/.env
 server/uploads/
 dist/
+
+# Garment meshes: licensed binaries, kept out of the repo.
+client/public/models/*.glb

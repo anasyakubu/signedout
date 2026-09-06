@@ -11,6 +11,7 @@ import {
 import { Wordmark, Button, Field, FormError } from '../components/ui';
 import { useAuth } from '../store/auth';
 import ShirtViewer from '../three/ShirtScene';
+import { GarmentId } from '../three/garments';
 import PlacementPanel, { Placement } from '../features/signing/PlacementPanel';
 import DrawPad from '../features/signing/DrawPad';
 
@@ -178,6 +179,7 @@ export default function SignPage() {
             shirtColor={ceremony.shirtColor}
             assets={ceremony.baseAssets}
             signatures={signatures}
+            garment={ceremony.garment as GarmentId | undefined}
           />
           {step === 'done' && (
             <div className="mt-6 border border-laurel bg-laurel-pale p-4 text-center">

@@ -20,6 +20,7 @@ export interface ICeremony extends Document {
   slug: string;
   visibility: 'public' | 'invite' | 'group';
   shirtColor: string;
+  garment: string;
   baseAssets: IBaseAsset[];
   isLocked: boolean;
   isPaidTier: boolean;
@@ -49,6 +50,13 @@ const ceremonySchema = new Schema<ICeremony>(
     slug: { type: String, required: true, unique: true, index: true },
     visibility: { type: String, enum: ['public', 'invite', 'group'], default: 'public' },
     shirtColor: { type: String, default: '#FFFFFF', match: /^#[0-9A-Fa-f]{6}$/ },
+    garment: {
+      type: String,
+      // Mirrors GARMENTS in client/src/three/garments.ts. Adding a garment
+      // there means adding its id here too, or the PATCH is rejected.
+      enum: ['classic-tee','oversized-tee','boxy-tee','long-sleeve','crewneck','hoodie','polo'],
+      default: 'classic-tee',
+    },
     baseAssets: { type: [assetSchema], default: [] },
     isLocked: { type: Boolean, default: false },
     isPaidTier: { type: Boolean, default: false },
